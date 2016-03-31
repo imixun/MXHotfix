@@ -1,0 +1,6 @@
+framework module Pods_MXHotfix_Example {
+  umbrella header "Pods-MXHotfix_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}
