@@ -7,12 +7,16 @@
 //
 
 #import "MXAppDelegate.h"
+#import "MXHotfix.h"
 
 @implementation MXAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    [MXHotfix startWithAppKey:@"test"];
+    [MXHotfix sync];
+    
     return YES;
 }
 

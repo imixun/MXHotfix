@@ -1,6 +1,0 @@
-framework module MXHotfix {
-  umbrella header "MXHotfix-umbrella.h"
-
-  export *
-  module * { export * }
-}
