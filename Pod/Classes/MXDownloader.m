@@ -39,7 +39,7 @@
 }
 
 - (void)getPatchForBuild:(NSString*)strBuild
-                 success:(void (^)(NSString* strPatchUrl))success
+                 success:(void (^)(NSString* strPatchUrl, NSString* strMD5))success
                  failure:(void (^)(NSError *error))failure
 {
     NSDictionary *params=@{@"app_type":@"2", @"version_index":strBuild};
@@ -50,10 +50,10 @@
                NSString* strReturn = [responseObject objectForKey:@"Return"];
                if ([@"0" isEqualToString:strReturn]) {
                    if (![responseObject objectForKey:@"Data"] || [[responseObject objectForKey:@"Data"] isKindOfClass:[NSNull class]]) {
-                       success(nil);
+                       success(nil, nil);
                    }
                    else {
-                       success([[responseObject objectForKey:@"Data"] objectForKey:@"patch_url"]);
+                       success([[responseObject objectForKey:@"Data"] objectForKey:@"patch_url"], [[responseObject objectForKey:@"Data"] objectForKey:@"md5_rsa"]);
                    }
                }
                else {
@@ -66,10 +66,26 @@
 }
 
 - (void)downPatchFromUrl:(NSString*)strUrl
-                 success:(void (^)(NSString* strPatchUrl))success
+                 success:(void (^)(NSString* strTmpPath))success
                  failure:(void (^)(NSError *error))failure
 {
-    
+    NSURLSessionDownloadTask *downloadTask = [_mHttpMgr downloadTaskWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:strUrl]]
+                                                                       progress:^(NSProgress * _Nonnull downloadProgress) {
+                                                                       }
+                                                                    destination:^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
+                                                                        NSURL *tmpDirectoryURL = [NSURL fileURLWithPath:NSTemporaryDirectory()];
+                                                                        return [tmpDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+                                                                    }
+                                                              completionHandler:^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
+                                                                  if (error) {
+                                                                      failure(error);
+                                                                  }
+                                                                  else {
+                                                                      success(filePath);
+                                                                  }
+                                                                  
+                                                              }];
+    [downloadTask resume];
 }
 
 @end

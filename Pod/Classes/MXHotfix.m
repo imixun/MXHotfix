@@ -47,7 +47,7 @@ static NSString*    gBuild;
         else {
             if (YES == [fileMgr fileExistsAtPath:patchFile]) {
                 // 2. 判断是否可以执行？
-                //FIXME:
+                //TODO:
                 if (YES) {
                     [JPEngine startEngine];
                     NSString *script = [NSString stringWithContentsOfFile:patchFile encoding:NSUTF8StringEncoding error:nil];
@@ -59,8 +59,19 @@ static NSString*    gBuild;
         // 3. 启动patch下载
         MXDownloader* downloader = [MXDownloader downloader];
         [downloader getPatchForBuild:gBuild
-                             success:^(NSString *strPatchUrl) {
+                             success:^(NSString *strPatchUrl, NSString* strMD5) {
                                  if (strPatchUrl) {
+                                     // download patch
+                                     [downloader downPatchFromUrl:strPatchUrl
+                                                          success:^(NSString *strTmpPath) {
+                                                              // 4. 解压
+                                                              
+                                                              // 5. 校验
+                                                              
+                                                          }
+                                                          failure:^(NSError *error) {
+                                                              // do nothing
+                                                          }];
                                  }
                                  else {
                                      // 没有 patch url，相当于作废之前的（删除）

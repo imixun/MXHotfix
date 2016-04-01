@@ -13,11 +13,11 @@
 + (instancetype)downloader;
 
 - (void)getPatchForBuild:(NSString*)strBuild
-                 success:(void (^)(NSString* strPatchUrl))success
+                 success:(void (^)(NSString* strPatchUrl, NSString* strMD5))success
                  failure:(void (^)(NSError *error))failure;
 
 - (void)downPatchFromUrl:(NSString*)strUrl
-                 success:(void (^)(NSString* strPatchUrl))success
+                 success:(void (^)(NSString* strTmpPath))success
                  failure:(void (^)(NSError *error))failure;
 
 @end
