@@ -33,9 +33,8 @@
 - (void)initDownloader
 {
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-    _mHttpMgr = [AFHTTPSessionManager manager];
-    [_mHttpMgr initWithBaseURL:[NSURL URLWithString:BASE_URL]
-          sessionConfiguration:configuration];
+    _mHttpMgr = [[AFHTTPSessionManager manager] initWithBaseURL:[NSURL URLWithString:BASE_URL]
+                                           sessionConfiguration:configuration];
 }
 
 - (void)getPatchForBuild:(NSString*)strBuild
@@ -44,25 +43,27 @@
 {
     NSDictionary *params=@{@"app_type":@"2", @"version_index":strBuild};
     [_mHttpMgr POST:@"/Api/Index/getVersionPatch"
-        parameters:params
-           success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-               NSLog(@"the responseObject is %@", responseObject);
-               NSString* strReturn = [responseObject objectForKey:@"Return"];
-               if ([@"0" isEqualToString:strReturn]) {
-                   if (![responseObject objectForKey:@"Data"] || [[responseObject objectForKey:@"Data"] isKindOfClass:[NSNull class]]) {
-                       success(nil, nil);
-                   }
-                   else {
-                       success([[responseObject objectForKey:@"Data"] objectForKey:@"patch_url"], [[responseObject objectForKey:@"Data"] objectForKey:@"md5_rsa"]);
-                   }
-               }
-               else {
-                   failure([NSError errorWithDomain:@"server" code:[strReturn integerValue] userInfo:nil]);
-               }
+         parameters:params
+           progress:^(NSProgress * _Nonnull uploadProgress) {
            }
-           failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-               failure(error);
-           }];
+            success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+                NSLog(@"the responseObject is %@", responseObject);
+                NSString* strReturn = [responseObject objectForKey:@"Return"];
+                if ([@"0" isEqualToString:strReturn]) {
+                    if (![responseObject objectForKey:@"Data"] || [[responseObject objectForKey:@"Data"] isKindOfClass:[NSNull class]]) {
+                        success(nil, nil);
+                    }
+                    else {
+                        success([[responseObject objectForKey:@"Data"] objectForKey:@"patch_url"], [[responseObject objectForKey:@"Data"] objectForKey:@"md5_rsa"]);
+                    }
+                }
+                else {
+                    failure([NSError errorWithDomain:@"server" code:[strReturn integerValue] userInfo:nil]);
+                }
+            }
+            failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+                failure(error);
+            }];
 }
 
 - (void)downPatchFromUrl:(NSString*)strUrl
@@ -81,7 +82,7 @@
                                                                       failure(error);
                                                                   }
                                                                   else {
-                                                                      success(filePath);
+                                                                      success([filePath path]);
                                                                   }
                                                                   
                                                               }];
