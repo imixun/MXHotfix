@@ -20,6 +20,8 @@ PODS:
   - MXHotfix (0.1.0):
     - AFNetworking (= 3.0.4)
     - JSPatch (= 0.2)
+    - PLCrashReporter (= 1.2.0)
+  - PLCrashReporter (1.2.0)
 
 DEPENDENCIES:
   - MXHotfix (from `../`)
@@ -31,6 +33,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AFNetworking: a0075feb321559dc78d9d85b55d11caa19eabb93
   JSPatch: 23dcceeec8f8357644f8ef70eb002ef2dbd830de
-  MXHotfix: fdd3b9d8507cc464094358532c008a6a51b2623a
+  MXHotfix: 2ac3bccb5823f5f0a730b0ed46576c30086c9616
+  PLCrashReporter: 16927d86a093d0b9cf110545dacb77cb0ed0f243
 
 COCOAPODS: 0.39.0

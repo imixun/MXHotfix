@@ -42,4 +42,5 @@ Pod::Spec.new do |s|
   # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'JSPatch', '0.2'
   s.dependency 'AFNetworking', '3.0.4'
+  s.dependency 'PLCrashReporter', '1.2.0'
 end
