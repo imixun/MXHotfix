@@ -14,7 +14,7 @@
 + (NSString *)unzipFileAtPath:(NSString *)strZipPath toDestination:(NSString *)strDestinationPath
 {
     NSString *destinationPath;
-    if (!strDestinationPath) { //若解压目录为空，则默认和压缩文件目录一致
+    if (!strDestinationPath) { // 若解压目录为空，则默认和压缩文件目录一致
         destinationPath = [strZipPath stringByDeletingLastPathComponent];
     }else {
         destinationPath = strDestinationPath;
@@ -25,9 +25,14 @@
     // 去掉扩展名后到文件名
     NSString *fileName  = [lastPath stringByDeletingPathExtension];
     // 解压
-    [SSZipArchive unzipFileAtPath:strZipPath toDestination:destinationPath];
+    BOOL unZipSuccess   = [SSZipArchive unzipFileAtPath:strZipPath toDestination:destinationPath];
     
-    return [destinationPath stringByAppendingPathComponent:fileName];
+    if (YES == unZipSuccess) { // 解压成功
+        return [destinationPath stringByAppendingPathComponent:fileName];
+    }else { // 解压失败
+        return @"";
+    }
+    
 }
 
 @end
