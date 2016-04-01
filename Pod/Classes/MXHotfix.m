@@ -10,6 +10,7 @@
 #import "JPEngine.h"
 #import <CrashReporter/CrashReporter.h>
 #import "MXDownloader.h"
+#import "MXArchiver.h"
 
 static NSString*    gAppKey;
 static NSString*    gBuild;
@@ -64,7 +65,7 @@ static NSString*    gBuild;
                 if ([crashReporter hasPendingCrashReport]) {
                     iCrashCount ++;
                     
-                    [patchRecord setObject:[NSString stringWithFormat:@"%d", iCrashCount] forKey:@"crash_count"];
+                    [patchRecord setObject:[NSString stringWithFormat:@"%ld", iCrashCount] forKey:@"crash_count"];
                     [patchRecord synchronize];
                     
                     [crashReporter purgePendingCrashReport];
@@ -84,7 +85,7 @@ static NSString*    gBuild;
                                          [downloader downPatchFromUrl:strPatchUrl
                                                               success:^(NSString *strTmpPath) {
                                                                   // 4. 解压
-                                                                  
+                                                                  NSString *filePath = [MXArchiver unzipFileAtPath:strTmpPath toDestination:nil];
                                                                   // 5. 校验，无误后才转移到 document 目录
                                                                   
                                                               }

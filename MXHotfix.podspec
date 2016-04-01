@@ -43,4 +43,5 @@ Pod::Spec.new do |s|
   s.dependency 'JSPatch', '0.2'
   s.dependency 'AFNetworking', '3.0.4'
   s.dependency 'PLCrashReporter', '1.2.0'
+  s.dependency 'SSZipArchive', '1.1'
 end
