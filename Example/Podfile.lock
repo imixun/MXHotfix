@@ -20,8 +20,10 @@ PODS:
   - MXHotfix (0.1.0):
     - AFNetworking (= 3.0.4)
     - JSPatch (= 0.2)
+    - OpenSSL (= 1.0.207)
     - PLCrashReporter (= 1.2.0)
     - SSZipArchive (= 1.1)
+  - OpenSSL (1.0.207)
   - PLCrashReporter (1.2.0)
   - SSZipArchive (1.1)
 
@@ -35,7 +37,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AFNetworking: a0075feb321559dc78d9d85b55d11caa19eabb93
   JSPatch: 23dcceeec8f8357644f8ef70eb002ef2dbd830de
-  MXHotfix: ce5c0519a2cf04d1f610712615fa8298c8f769df
+  MXHotfix: b79e73347c242e57395e1dafb202736234aa876d
+  OpenSSL: 26eb46b2836c0dade24fa53276b552f14c6eece1
   PLCrashReporter: 16927d86a093d0b9cf110545dacb77cb0ed0f243
   SSZipArchive: de3d215ab73f87db627f81f2ce24f1731e3886c3
 

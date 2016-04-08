@@ -11,6 +11,7 @@
 #import <CrashReporter/CrashReporter.h>
 #import "MXDownloader.h"
 #import "MXArchiver.h"
+#import "MXVertifier.h"
 
 static NSString*    gAppKey;
 static NSString*    gBuild;
@@ -86,7 +87,24 @@ static NSString*    gBuild;
                                                               success:^(NSString *strTmpPath) {
                                                                   // 4. 解压
                                                                   NSString *filePath = [MXArchiver unzipFileAtPath:strTmpPath toDestination:nil];
+                                                                  
                                                                   // 5. 校验，无误后才转移到 document 目录
+                                                                  if (nil != filePath) {  // 解压成功
+                                                                      // 计算文件的MD5值
+                                                                      MXVertifier *vertf    = [[MXVertifier alloc] init];
+                                                                      NSString *zipFilePath = [filePath stringByAppendingString:@".zip"];
+                                                                      NSString *fileMD5     = [vertf getFileMD5WithPath:zipFilePath];
+                                                                      
+                                                                      if ([vertf vertifyWithEncryptMD5:strMD5 fileMD5:fileMD5]) {
+                                                                          NSString *srcPath = [filePath stringByAppendingString:@".js"];
+                                                                          if ([vertf moveItemAtPath:srcPath]) {
+                                                                              
+                                                                          }else { //移动失败
+                                                                              
+                                                                          }
+                                                                          
+                                                                      }
+                                                                  }
                                                                   
                                                               }
                                                               failure:^(NSError *error) {

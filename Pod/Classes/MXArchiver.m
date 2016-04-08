@@ -30,7 +30,7 @@
     if (YES == unZipSuccess) { // 解压成功
         return [destinationPath stringByAppendingPathComponent:fileName];
     }else { // 解压失败
-        return @"";
+        return nil;
     }
     
 }
