@@ -97,7 +97,7 @@ static NSString*    gBuild;
                                                                       
                                                                       if ([vertf vertifyWithEncryptMD5:strMD5 fileMD5:fileMD5]) {
                                                                           NSString *srcPath = [filePath stringByAppendingString:@".js"];
-                                                                          if ([vertf moveItemAtPath:srcPath]) {
+                                                                          if ([vertf moveAndCoverItemAtPath:srcPath targetFileName:gBuild]) {
                                                                               [patchRecord setObject:strMD5 forKey:@"patch_md5"];
                                                                               [patchRecord synchronize];
                                                                           }else { //移动失败

@@ -35,8 +35,9 @@
 /**
  * 移动文件到document的patch文件夹下
  * @param  : strSrcPath 源文件路径
+ * @param  : fileName   需要保存的文件名
  * @return : 是否移动成功
  */
-- (BOOL)moveItemAtPath:(NSString *)strSrcPath;
+- (BOOL)moveAndCoverItemAtPath:(NSString *)strSrcPath targetFileName:(NSString *)fileName;
 
 @end
