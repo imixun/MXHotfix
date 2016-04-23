@@ -8,10 +8,10 @@
 
 #import "MXVertifier.h"
 #import <CommonCrypto/CommonCrypto.h>
-#include <OpenSSL/rsa.h>
-#include <OpenSSL/pem.h>
-#include <OpenSSL/err.h>
-#include <OpenSSL/md5.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#include <openssl/err.h>
+#include <openssl/md5.h>
 
 typedef enum {
     RSA_PADDING_TYPE_NONE       = RSA_NO_PADDING,
