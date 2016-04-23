@@ -24,6 +24,9 @@
     NSString *lastPath  = [strZipPath lastPathComponent];
     // 去掉扩展名后到文件名
     NSString *fileName  = [lastPath stringByDeletingPathExtension];
+    // 添加 js 的后缀
+    fileName = [fileName stringByAppendingString:@".js"];
+
     // 解压
     BOOL unZipSuccess   = [SSZipArchive unzipFileAtPath:strZipPath toDestination:destinationPath];
     
@@ -32,7 +35,6 @@
     }else { // 解压失败
         return nil;
     }
-    
 }
 
 @end

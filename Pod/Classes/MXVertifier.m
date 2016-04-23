@@ -232,22 +232,4 @@ done:
 }
 #pragma mark end 校验MD5值是否相同
 
-#pragma mark - start 移动文件至document的patch文件夹下
-- (BOOL)moveAndCoverItemAtPath:(NSString *)strSrcPath targetFileName:(NSString *)fileName
-{
-    NSArray *paths       = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *docDir     = [paths objectAtIndex:0];
-    NSString *toPath     = [docDir stringByAppendingPathComponent:[NSString stringWithFormat:@"patch/%@", fileName]];
-    NSFileManager *magr  = [NSFileManager defaultManager];
-    if ([magr fileExistsAtPath:toPath]) {  //若目标文件存在则先删除
-        [magr removeItemAtPath:toPath error:nil];
-    }
-    NSError *error;
-    BOOL didSucceed      = [magr moveItemAtPath:strSrcPath
-                                         toPath:toPath
-                                          error:&error];
-    return didSucceed;
-}
-#pragma mark end 移动文件至document的patch文件夹下
-
 @end

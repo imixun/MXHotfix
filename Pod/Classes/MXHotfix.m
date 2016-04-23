@@ -39,7 +39,7 @@ static NSString*    gBuild;
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
         NSString *docDir = [paths objectAtIndex:0];
         NSString *patchDir = [NSString stringWithFormat:@"%@/%@", docDir, PATCH_DIR];
-        NSString* patchFile = [NSString stringWithFormat:@"%@/%@", patchDir, gBuild];
+        NSString* patchFile = [self patchPathForBuild:gBuild];
         
         NSFileManager* fileMgr = [NSFileManager defaultManager];
         if (NO == [fileMgr fileExistsAtPath:patchDir]) {
@@ -85,28 +85,30 @@ static NSString*    gBuild;
                                          // 和本地已存在的patch不同，才download patch
                                          [downloader downPatchFromUrl:strPatchUrl
                                                               success:^(NSString *strTmpPath) {
-                                                                  // 4. 解压
-                                                                  NSString *filePath = [MXArchiver unzipFileAtPath:strTmpPath toDestination:nil];
+                                                                  // 4. 校验（是对压缩包校验的）
+                                                                  // 计算文件的MD5值
+                                                                  MXVertifier *vertf    = [[MXVertifier alloc] init];
+                                                                  NSString *fileMD5     = [vertf getFileMD5WithPath:strTmpPath];
                                                                   
-                                                                  // 5. 校验，无误后才转移到 document 目录
-                                                                  if (nil != filePath) {  // 解压成功
-                                                                      // 计算文件的MD5值
-                                                                      MXVertifier *vertf    = [[MXVertifier alloc] init];
-                                                                      NSString *zipFilePath = [filePath stringByAppendingString:@".zip"];
-                                                                      NSString *fileMD5     = [vertf getFileMD5WithPath:zipFilePath];
-                                                                      
-                                                                      if ([vertf vertifyWithEncryptMD5:strMD5 fileMD5:fileMD5]) {
-                                                                          NSString *srcPath = [filePath stringByAppendingString:@".js"];
-                                                                          if ([vertf moveAndCoverItemAtPath:srcPath targetFileName:gBuild]) {
-                                                                              [patchRecord setObject:strMD5 forKey:@"patch_md5"];
-                                                                              [patchRecord synchronize];
-                                                                          }else { //移动失败
-                                                                              
-                                                                          }
-                                                                          
+                                                                  if ([vertf vertifyWithEncryptMD5:strMD5 fileMD5:fileMD5]) {
+                                                                      // 5. 解压
+                                                                      NSString *srcPath = [MXArchiver unzipFileAtPath:strTmpPath toDestination:nil];
+                                                                      NSString *toPath = [self patchPathForBuild:gBuild];
+                                                                      NSFileManager *magr  = [NSFileManager defaultManager];
+                                                                      if ([magr fileExistsAtPath:toPath]) {
+                                                                          //若目标文件存在则先删除
+                                                                          [magr removeItemAtPath:toPath error:nil];
+                                                                      }
+                                                                      if ([magr moveItemAtPath:srcPath
+                                                                                        toPath:toPath
+                                                                                         error:nil]) {
+                                                                          [patchRecord setObject:strMD5 forKey:@"patch_md5"];
+                                                                          [patchRecord synchronize];
+                                                                      }
+                                                                      else { //移动失败
+                                                                          // do nothing
                                                                       }
                                                                   }
-                                                                  
                                                               }
                                                               failure:^(NSError *error) {
                                                                   // do nothing
@@ -122,6 +124,16 @@ static NSString*    gBuild;
                                  // do nothing
                              }];
     });
+}
+
++(NSString*)patchPathForBuild:(NSString*)build
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *docDir = [paths objectAtIndex:0];
+    NSString *patchDir = [NSString stringWithFormat:@"%@/%@", docDir, PATCH_DIR];
+    NSString* patchFile = [NSString stringWithFormat:@"%@/%@", patchDir, build];
+
+    return patchFile;
 }
 
 @end
