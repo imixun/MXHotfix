@@ -93,20 +93,22 @@ static NSString*    gBuild;
                                                                   if ([vertf vertifyWithEncryptMD5:strMD5 fileMD5:fileMD5]) {
                                                                       // 5. 解压
                                                                       NSString *srcPath = [MXArchiver unzipFileAtPath:strTmpPath toDestination:nil];
-                                                                      NSString *toPath = [self patchPathForBuild:gBuild];
-                                                                      NSFileManager *magr  = [NSFileManager defaultManager];
-                                                                      if ([magr fileExistsAtPath:toPath]) {
-                                                                          //若目标文件存在则先删除
-                                                                          [magr removeItemAtPath:toPath error:nil];
-                                                                      }
-                                                                      if ([magr moveItemAtPath:srcPath
-                                                                                        toPath:toPath
-                                                                                         error:nil]) {
-                                                                          [patchRecord setObject:strMD5 forKey:@"patch_md5"];
-                                                                          [patchRecord synchronize];
-                                                                      }
-                                                                      else { //移动失败
-                                                                          // do nothing
+                                                                      if (srcPath) {
+                                                                          NSString *toPath = [self patchPathForBuild:gBuild];
+                                                                          NSFileManager *magr  = [NSFileManager defaultManager];
+                                                                          if ([magr fileExistsAtPath:toPath]) {
+                                                                              //若目标文件存在则先删除
+                                                                              [magr removeItemAtPath:toPath error:nil];
+                                                                          }
+                                                                          if ([magr moveItemAtPath:srcPath
+                                                                                            toPath:toPath
+                                                                                             error:nil]) {
+                                                                              [patchRecord setObject:strMD5 forKey:@"patch_md5"];
+                                                                              [patchRecord synchronize];
+                                                                          }
+                                                                          else { //移动失败
+                                                                              // do nothing
+                                                                          }
                                                                       }
                                                                   }
                                                               }

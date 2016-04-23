@@ -7,18 +7,11 @@
 //
 
 #import "MXDownloader.h"
-#import "AFNetworking.h"
 #import <CommonCrypto/CommonDigest.h>
 
-#define BASE_URL    @"http://appmgr.imixun.com/"
-#define APP_KEY     @"5718a5cc7c45fwjfiw"
-#define APP_SECRET  @"f70551bc7e7388517aa9c5ce3eb8660d"
-
-@interface MXDownloader()
-
-@property (strong, nonatomic) AFHTTPSessionManager*    mHttpMgr;
-
-@end
+#define UPDATE_INFO_URL     @"http://appmgr.imixun.com/api/app/updateInfo"
+#define APP_KEY             @"5718a5cc7c45fwjfiw"
+#define APP_SECRET          @"f70551bc7e7388517aa9c5ce3eb8660d"
 
 @implementation MXDownloader
 
@@ -28,16 +21,8 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         downloader = [[MXDownloader alloc] init];
-        [downloader initDownloader];
     });
     return downloader;
-}
-
-- (void)initDownloader
-{
-    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-    _mHttpMgr = [[AFHTTPSessionManager manager] initWithBaseURL:[NSURL URLWithString:BASE_URL]
-                                           sessionConfiguration:configuration];
 }
 
 - (void)getPatchForBuild:(NSString*)strBuild
@@ -52,59 +37,90 @@
                            @"app_key":APP_KEY,
                            @"nonce":strNonce,
                            @"signature":strSignature};
-
-    [_mHttpMgr GET:@"api/app/updateInfo"
-         parameters:params
-           progress:^(NSProgress * _Nonnull uploadProgress) {
-           }
-            success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                NSLog(@"the responseObject is %@", responseObject);
-                NSString* strReturn = [responseObject objectForKey:@"Return"];
-                if ([@"0" isEqualToString:strReturn]) {
-                    if (![responseObject objectForKey:@"Data"] || [[responseObject objectForKey:@"Data"] isKindOfClass:[NSNull class]]) {
-                        success(nil, nil);
-                    }
-                    else {
-                        NSDictionary *dicData = [responseObject objectForKey:@"Data"];
-                        NSString *strUrl = [[dicData objectForKey:@"current_version_patch"] objectForKey:@"url"];
-                        NSString *strMD5 = [[dicData objectForKey:@"current_version_patch"] objectForKey:@"md5_rsa"];
-                        if (strUrl && strMD5) {
-                            success(strUrl, strMD5);
-                        }
-                        else {
-                            success(nil, nil);
-                        }
-                    }
-                }
-                else {
-                    failure([NSError errorWithDomain:@"server" code:[strReturn integerValue] userInfo:nil]);
-                }
-            }
-            failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                failure(error);
-            }];
+    
+    NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration:defaultConfigObject
+                                                                 delegate:nil
+                                                            delegateQueue:[NSOperationQueue mainQueue]];
+    NSString *strUrl = UPDATE_INFO_URL;
+    NSInteger iIndex = 0;
+    for (NSString *key in params) {
+        if (0 == iIndex) {
+            strUrl = [strUrl stringByAppendingString:[NSString stringWithFormat:@"?%@=%@", key, params[key]]];
+        }
+        else {
+            strUrl = [strUrl stringByAppendingString:[NSString stringWithFormat:@"&%@=%@", key, params[key]]];
+        }
+        iIndex ++;
+    }
+    
+    NSURL * url = [NSURL URLWithString:strUrl];
+    
+    NSURLSessionDataTask * dataTask = [defaultSession dataTaskWithURL:url
+                                                    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                                        if(error == nil)
+                                                        {
+                                                            NSDictionary *responseObject = [NSJSONSerialization JSONObjectWithData:data
+                                                                                                                           options:NSJSONReadingMutableContainers
+                                                                                                                             error:nil];
+                                                            NSLog(@"the responseObject is %@", responseObject);
+                                                            NSString* strReturn = [responseObject objectForKey:@"Return"];
+                                                            if ([@"0" isEqualToString:strReturn]) {
+                                                                if (![responseObject objectForKey:@"Data"] || [[responseObject objectForKey:@"Data"] isKindOfClass:[NSNull class]]) {
+                                                                    success(nil, nil);
+                                                                }
+                                                                else {
+                                                                    NSDictionary *dicData = [responseObject objectForKey:@"Data"];
+                                                                    NSString *strUrl = [[dicData objectForKey:@"current_version_patch"] objectForKey:@"url"];
+                                                                    NSString *strMD5 = [[dicData objectForKey:@"current_version_patch"] objectForKey:@"md5_rsa"];
+                                                                    if (strUrl && strMD5) {
+                                                                        success(strUrl, strMD5);
+                                                                    }
+                                                                    else {
+                                                                        success(nil, nil);
+                                                                    }
+                                                                }
+                                                            }
+                                                            else {
+                                                                failure([NSError errorWithDomain:@"server" code:[strReturn integerValue] userInfo:nil]);
+                                                            }
+                                                        }
+                                                        else {
+                                                            failure(error);
+                                                        }
+                                                    }];
+    
+    [dataTask resume];
 }
 
 - (void)downPatchFromUrl:(NSString*)strUrl
                  success:(void (^)(NSString* strTmpPath))success
                  failure:(void (^)(NSError *error))failure
 {
-    NSURLSessionDownloadTask *downloadTask = [_mHttpMgr downloadTaskWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:strUrl]]
-                                                                       progress:^(NSProgress * _Nonnull downloadProgress) {
-                                                                       }
-                                                                    destination:^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
-                                                                        NSURL *tmpDirectoryURL = [NSURL fileURLWithPath:NSTemporaryDirectory()];
-                                                                        return [tmpDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+    NSString *fileName = [strUrl lastPathComponent];
+    NSURL * url = [NSURL URLWithString:strUrl];
+    
+    NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration:defaultConfigObject
+                                                                 delegate:nil
+                                                            delegateQueue:[NSOperationQueue mainQueue]];
+    
+    NSURLSessionDownloadTask * downloadTask = [defaultSession downloadTaskWithURL:url
+                                                                completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                                                                    if(error == nil)
+                                                                    {
+                                                                        // 保存在tmp目录，按照url的文件名
+                                                                        NSString *dstPath = [NSString stringWithFormat:@"%@/%@", [[location path] stringByDeletingLastPathComponent], fileName];
+                                                                        [[NSFileManager defaultManager] moveItemAtPath:[location path]
+                                                                                                                toPath:dstPath
+                                                                                                                 error:nil];
+                                                                        success(dstPath);
                                                                     }
-                                                              completionHandler:^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
-                                                                  if (error) {
-                                                                      failure(error);
-                                                                  }
-                                                                  else {
-                                                                      success([filePath path]);
-                                                                  }
-                                                                  
-                                                              }];
+                                                                    else {
+                                                                        failure(error);
+                                                                    }
+                                                                }];
+    
     [downloadTask resume];
 }
 

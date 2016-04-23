@@ -41,7 +41,6 @@ Pod::Spec.new do |s|
   s.public_header_files = 'Pod/Classes/MXHotfix.h'
   # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'JSPatch', '0.2'
-  s.dependency 'AFNetworking', '3.0.4'
   s.dependency 'PLCrashReporter', '1.2.0'
   s.dependency 'SSZipArchive', '1.1'
   s.dependency 'OpenSSL', '1.0.207'
