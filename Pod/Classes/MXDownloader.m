@@ -25,16 +25,17 @@
     return downloader;
 }
 
-- (void)getPatchForBuild:(NSString*)strBuild
-                 success:(void (^)(NSString* strPatchUrl, NSString* strMD5))success
-                 failure:(void (^)(NSError *error))failure
+- (void)getPatchForApp:(NSString*)strAppKey
+                 build:(NSString*)strBuild
+               success:(void (^)(NSString* strPatchUrl, NSString* strMD5))success
+               failure:(void (^)(NSError *error))failure
 {
     NSString *strNonce = [self getRandomString];
     NSString *strSignature = [self getMD5NSString:[NSString stringWithFormat:@"1%@%@", APP_SECRET, strNonce]];
 
     NSDictionary *params=@{@"app_type":@"2",
                            @"version_index":strBuild,
-                           @"app_key":APP_KEY,
+                           @"app_key":strAppKey,
                            @"nonce":strNonce,
                            @"signature":strSignature};
     

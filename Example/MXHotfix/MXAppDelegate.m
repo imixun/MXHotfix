@@ -14,7 +14,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    [MXHotfix startWithAppKey:@"test"];
+    [MXHotfix startWithAppKey:@"5718a5cc7c45fwjfiw"];
     [MXHotfix sync];
     
     return YES;
