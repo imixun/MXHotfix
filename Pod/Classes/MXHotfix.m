@@ -14,6 +14,7 @@
 #import "MXVertifier.h"
 
 static NSString*    gAppKey;
+static NSString*    gAppSecret;
 static NSString*    gBuild;
 
 #define PATCH_DIR   @"patch"
@@ -21,10 +22,12 @@ static NSString*    gBuild;
 @implementation MXHotfix
 
 +(void)startWithAppKey:(NSString*)strKey
+             appSecret:(NSString*)strSecret
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         gAppKey = strKey;
+        gAppSecret = strSecret;
         
         gBuild = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
     });
@@ -77,6 +80,7 @@ static NSString*    gBuild;
         // 3. 启动patch下载
         MXDownloader* downloader = [MXDownloader downloader];
         [downloader getPatchForApp:gAppKey
+                            secret:gAppSecret
                              build:gBuild
                            success:^(NSString *strPatchUrl, NSString* strMD5) {
                                if (strPatchUrl) {

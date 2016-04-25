@@ -10,7 +10,8 @@
 
 @interface MXHotfix : NSObject
 
-+(void)startWithAppKey:(NSString*)strKey;
++(void)startWithAppKey:(NSString*)strKey
+             appSecret:(NSString*)strSecret;
 
 /*
     (1)本地是否已经有patch，如果有就执行；

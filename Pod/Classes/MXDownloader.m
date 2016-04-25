@@ -10,8 +10,6 @@
 #import <CommonCrypto/CommonDigest.h>
 
 #define UPDATE_INFO_URL     @"http://appmgr.imixun.com/api/app/updateInfo"
-#define APP_KEY             @"5718a5cc7c45fwjfiw"
-#define APP_SECRET          @"f70551bc7e7388517aa9c5ce3eb8660d"
 
 @implementation MXDownloader
 
@@ -26,12 +24,13 @@
 }
 
 - (void)getPatchForApp:(NSString*)strAppKey
+                secret:(NSString*)strAppSecret
                  build:(NSString*)strBuild
                success:(void (^)(NSString* strPatchUrl, NSString* strMD5))success
                failure:(void (^)(NSError *error))failure
 {
     NSString *strNonce = [self getRandomString];
-    NSString *strSignature = [self getMD5NSString:[NSString stringWithFormat:@"1%@%@", APP_SECRET, strNonce]];
+    NSString *strSignature = [self getMD5NSString:[NSString stringWithFormat:@"1%@%@", strAppSecret, strNonce]];
 
     NSDictionary *params=@{@"app_type":@"2",
                            @"version_index":strBuild,

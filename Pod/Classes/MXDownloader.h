@@ -13,6 +13,7 @@
 + (instancetype)downloader;
 
 - (void)getPatchForApp:(NSString*)strAppKey
+                secret:(NSString*)strAppSecret
                  build:(NSString*)strBuild
                success:(void (^)(NSString* strPatchUrl, NSString* strMD5))success
                failure:(void (^)(NSError *error))failure;
